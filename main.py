@@ -158,7 +158,7 @@ class RedBlackTree:
         return y
 
     def delete_fixup(self, x):
-        while x != self.NIL and x != self.T and x.color == COLOR.BLACK:
+        while x != self.T and x.color == COLOR.BLACK:
             if x == x.parent.left:
                 w = x.parent.right
                 if w.color == COLOR.RED:
@@ -166,7 +166,7 @@ class RedBlackTree:
                     x.parent.color = COLOR.RED
                     self.left_rotate(x.parent)
                     w = x.parent.right
-                if w.left.color == COLOR.BLACK and w.right.color == COLOR.BLACK:
+                if w.right != self.NIL and w.left != self.NIL and w.left.color == COLOR.BLACK and w.right.color == COLOR.BLACK:
                     w.color = COLOR.RED
                     x = x.parent
                 elif w.right.color == COLOR.BLACK:
@@ -186,7 +186,7 @@ class RedBlackTree:
                     x.parent.color = COLOR.RED
                     self.left_rotate(x.parent)
                     w = x.parent.left
-                if w.right.color == COLOR.BLACK and w.left.color == COLOR.BLACK:
+                if  w.right != self.NIL and w.left != self.NIL and w.right.color == COLOR.BLACK and w.left.color == COLOR.BLACK:
                     w.color = COLOR.RED
                     x = x.parent
                 elif w.left.color == COLOR.BLACK:
@@ -199,7 +199,18 @@ class RedBlackTree:
                 w.left.color = COLOR.BLACK
                 self.left_rotate(x.parent)
                 x = self.T
-        x.color = COLOR.BLACK
+
+        if x != self.NIL:
+            x.color = COLOR.BLACK
+
+    def transplant(self, u, v):
+        if u.parent == self.NIL:
+            self.T = v
+        elif u == u.parent.left:
+            u.parent.left = v
+        else:
+            u.parent.right = v
+        v.parent = u.parent
 
     def delete(self, i):
 
@@ -218,12 +229,11 @@ class RedBlackTree:
         else:
             y = self.tree_successor(z)
 
-        if y.left != self.NIL:
+        if z.left != self.NIL:
             x = y.left
         else:
             x = y.right
 
-        # check for child nodes
         if x != self.NIL:
             x.parent = y.parent
 
@@ -236,18 +246,27 @@ class RedBlackTree:
                 y.parent.right = x
 
         if y != z:
-            z.key = y.key
-            z.color = y.color
-            z.left = y.left
-            z.right = y.right
-            z.size = y.size
-            # z.parent = y.parent
+            y.left = z.left
+            if y.left != self.NIL:
+                y.left.parent = y
+            y.right = z.right
+            if y.right != self.NIL:
+                y.right.parent = y
+            y.parent = z.parent
+
+            if z == self.T:
+                self.T = y
+            else:
+                if z == z.parent.left:
+                    z.parent.left = y
+                else:
+                    z.parent.right = y
 
         if y.color == COLOR.BLACK:
             self.delete_fixup(x)
 
-        return y
 
+        return y
 
 lst = [41, 38, 31, 12, 19, 8]
 # lst = [26, 17, 41, 14, 21,30, 47, 10, 16, 19, 21, 28, 38, 7, 12, 14, 20, 35, 39, 3]
