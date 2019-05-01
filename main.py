@@ -157,48 +157,63 @@ class RedBlackTree:
             y = y.parent
         return y
 
-    def delete_fixup(self, x):
-        while x != self.T and x.color == COLOR.BLACK:
-            if x == x.parent.left:
-                w = x.parent.right
-                if w.color == COLOR.RED:
-                    w.color = COLOR.BLACK
-                    x.parent.color = COLOR.RED
-                    self.left_rotate(x.parent)
-                    w = x.parent.right
-                if w.right != self.NIL and w.left != self.NIL and w.left.color == COLOR.BLACK and w.right.color == COLOR.BLACK:
-                    w.color = COLOR.RED
-                    x = x.parent
-                elif w.right.color == COLOR.BLACK:
-                    w.left.color = COLOR.BLACK
-                    w.color = COLOR.RED
-                    self.right_rotate(w)
-                    w = x.parent.right
-                w.color = x.parent.color
-                x.parent.color = COLOR.BLACK
-                w.right.color = COLOR.BLACK
-                self.left_rotate(x.parent)
-                x = self.T
+    def delete_fixup(self, x, y):
+        father = y.parent
+        while x != self.T and (x == self.NIL or x.color == COLOR.BLACK):
+            if x == father.left:
+                w = father.right
+                if w == self.NIL:
+                    x = self.T
+                else:
+                    if w.color == COLOR.RED:
+                        w.color = COLOR.BLACK
+                        father.color = COLOR.RED
+                        self.left_rotate(father)
+                        continue
+                    if w.right != self.NIL and w.left != self.NIL and w.left.color == COLOR.BLACK and w.right.color == COLOR.BLACK:
+                        w.color = COLOR.RED
+                        x = father
+                        father = x.parent
+                    else:
+                        if w.right == self.NIL or  w.right.color == COLOR.BLACK:
+                            if w.left != self.NIL:
+                                w.left.color = COLOR.BLACK
+                                w.color = COLOR.RED
+                                self.right_rotate(w)
+                                w = father.right
+                        w.color = father.color
+                        father.color = COLOR.BLACK
+                        if w.right != self.NIL:
+                            w.right.color = COLOR.BLACK
+                        self.left_rotate(father)
+                        x = self.T
             else:
-                w = x.parent.left
-                if w.color == COLOR.RED:
-                    w.color = COLOR.BLACK
-                    x.parent.color = COLOR.RED
-                    self.left_rotate(x.parent)
-                    w = x.parent.left
-                if  w.right != self.NIL and w.left != self.NIL and w.right.color == COLOR.BLACK and w.left.color == COLOR.BLACK:
-                    w.color = COLOR.RED
-                    x = x.parent
-                elif w.left.color == COLOR.BLACK:
-                    w.right.color = COLOR.BLACK
-                    w.color = COLOR.RED
-                    self.right_rotate(w)
-                    w = x.parent.left
-                w.color = x.parent.color
-                x.parent.color = COLOR.BLACK
-                w.left.color = COLOR.BLACK
-                self.left_rotate(x.parent)
-                x = self.T
+                w = father.left
+                if w == self.NIL:
+                    x = self.T
+                else:
+                    if w.color == COLOR.RED:
+                        w.color = COLOR.BLACK
+                        father.color = COLOR.RED
+                        self.right_rotate(father)
+                        continue
+                    if w.right != self.NIL and w.left != self.NIL and w.left.color == COLOR.BLACK and w.right.color == COLOR.BLACK:
+                        w.color = COLOR.RED
+                        x = father
+                        father = x.parent
+                    else:
+                        if w.left == self.NIL or w.left.color == COLOR.BLACK:
+                            if w.right != self.NIL:
+                                w.right.color = COLOR.BLACK
+                                w.color = COLOR.RED
+                                self.left_rotate(w)
+                                w = father.left
+                        w.color = father.color
+                        father.color = COLOR.BLACK
+                        if w.left != self.NIL:
+                            w.left.color = COLOR.BLACK
+                        self.right_rotate(father)
+                        x = self.T
 
         if x != self.NIL:
             x.color = COLOR.BLACK
@@ -239,31 +254,16 @@ class RedBlackTree:
 
         if y.parent == self.NIL:
             self.T = x
+        elif y == y.parent.left:
+            y.parent.left = x
         else:
-            if y == y.parent.left:
-                y.parent.left = x
-            else:
-                y.parent.right = x
+            y.parent.right = x
 
         if y != z:
-            y.left = z.left
-            if y.left != self.NIL:
-                y.left.parent = y
-            y.right = z.right
-            if y.right != self.NIL:
-                y.right.parent = y
-            y.parent = z.parent
-
-            if z == self.T:
-                self.T = y
-            else:
-                if z == z.parent.left:
-                    z.parent.left = y
-                else:
-                    z.parent.right = y
+            z.key = y.key
 
         if y.color == COLOR.BLACK:
-            self.delete_fixup(x)
+            self.delete_fixup(x, y)
 
 
         return y
