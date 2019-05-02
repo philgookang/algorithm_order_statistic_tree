@@ -157,9 +157,9 @@ class RedBlackTree:
             y = y.parent
         return y
 
-    def delete_fixup(self, x, y):
-        father = y.parent
+    def delete_fixup(self, x):
         while x != self.T and (x == self.NIL or x.color == COLOR.BLACK):
+            father = x.parent
             if x == father.left:
                 w = father.right
                 if w == self.NIL:
@@ -168,19 +168,18 @@ class RedBlackTree:
                     if w.color == COLOR.RED:
                         w.color = COLOR.BLACK
                         father.color = COLOR.RED
-                        self.left_rotate(father)    # father
-                        continue
+                        self.left_rotate(father)
+                        w = father.right
                     if (w.left == self.NIL or w.left.color == COLOR.BLACK) and \
                             (w.right == self.NIL or w.right.color == COLOR.BLACK):
                         w.color = COLOR.RED
                         x = father
-                        father = x.parent
                     else:
                         if w.right == self.NIL or  w.right.color == COLOR.BLACK:
                             if w.left != self.NIL:
                                 w.left.color = COLOR.BLACK
                                 w.color = COLOR.RED
-                                self.right_rotate(father)    # w
+                                self.right_rotate(w)    # w
                                 w = father.right
                         w.color = father.color
                         father.color = COLOR.BLACK
@@ -197,18 +196,17 @@ class RedBlackTree:
                         w.color = COLOR.BLACK
                         father.color = COLOR.RED
                         self.right_rotate(father) # father
-                        continue
+                        w = father.left
                     if (w.left == self.NIL or w.left.color == COLOR.BLACK) and \
                             (w.right == self.NIL or w.right.color == COLOR.BLACK):
                         w.color = COLOR.RED
                         x = father
-                        father = x.parent
                     else:
                         if w.left == self.NIL or w.left.color == COLOR.BLACK:
                             if w.right != self.NIL:
                                 w.right.color = COLOR.BLACK
                                 w.color = COLOR.RED
-                                self.left_rotate(father)   # w
+                                self.left_rotate(w)   # w
                                 w = father.left
                         w.color = father.color
                         father.color = COLOR.BLACK
@@ -246,13 +244,13 @@ class RedBlackTree:
         else:
             y = self.tree_successor(z)
 
-        if z.left != self.NIL:
+        if y.left != self.NIL:
             x = y.left
         else:
             x = y.right
 
-        if x != self.NIL:
-            x.parent = y.parent
+        if x == self.NIL: x = Node( color = COLOR.BLACK )  # 필구 추가
+        x.parent = y.parent
 
         if y.parent == self.NIL:
             self.T = x
@@ -265,7 +263,7 @@ class RedBlackTree:
             z.key = y.key
 
         if y.color == COLOR.BLACK:
-            self.delete_fixup(x, y)
+            self.delete_fixup(x)
 
 
         return y
