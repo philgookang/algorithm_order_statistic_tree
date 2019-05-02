@@ -168,9 +168,10 @@ class RedBlackTree:
                     if w.color == COLOR.RED:
                         w.color = COLOR.BLACK
                         father.color = COLOR.RED
-                        self.left_rotate(father)
+                        self.left_rotate(father)    # father
                         continue
-                    if w.right != self.NIL and w.left != self.NIL and w.left.color == COLOR.BLACK and w.right.color == COLOR.BLACK:
+                    if (w.left == self.NIL or w.left.color == COLOR.BLACK) and \
+                            (w.right == self.NIL or w.right.color == COLOR.BLACK):
                         w.color = COLOR.RED
                         x = father
                         father = x.parent
@@ -179,13 +180,13 @@ class RedBlackTree:
                             if w.left != self.NIL:
                                 w.left.color = COLOR.BLACK
                                 w.color = COLOR.RED
-                                self.right_rotate(w)
+                                self.right_rotate(father)    # w
                                 w = father.right
                         w.color = father.color
                         father.color = COLOR.BLACK
                         if w.right != self.NIL:
                             w.right.color = COLOR.BLACK
-                        self.left_rotate(father)
+                        self.left_rotate(father)    # father
                         x = self.T
             else:
                 w = father.left
@@ -195,9 +196,10 @@ class RedBlackTree:
                     if w.color == COLOR.RED:
                         w.color = COLOR.BLACK
                         father.color = COLOR.RED
-                        self.right_rotate(father)
+                        self.right_rotate(father) # father
                         continue
-                    if w.right != self.NIL and w.left != self.NIL and w.left.color == COLOR.BLACK and w.right.color == COLOR.BLACK:
+                    if (w.left == self.NIL or w.left.color == COLOR.BLACK) and \
+                            (w.right == self.NIL or w.right.color == COLOR.BLACK):
                         w.color = COLOR.RED
                         x = father
                         father = x.parent
@@ -206,13 +208,13 @@ class RedBlackTree:
                             if w.right != self.NIL:
                                 w.right.color = COLOR.BLACK
                                 w.color = COLOR.RED
-                                self.left_rotate(w)
+                                self.left_rotate(father)   # w
                                 w = father.left
                         w.color = father.color
                         father.color = COLOR.BLACK
                         if w.left != self.NIL:
                             w.left.color = COLOR.BLACK
-                        self.right_rotate(father)
+                        self.right_rotate(father)   # father
                         x = self.T
 
         if x != self.NIL:
@@ -276,6 +278,8 @@ for i in lst:
     tree.insert(Node(key = i))
 
 tree.delete( 19 )
+
+tree.delete( 12 )
 
 if len(lst) == 3:
     print("hello")
