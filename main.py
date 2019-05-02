@@ -15,26 +15,9 @@ class Node:
 class RedBlackTree:
 
     def __init__(self):
-        self.T = None
-        self.NIL = None
-
-    def select(self, x, i):
-        r = x.left.size + 1
-        if i == r:
-            return x
-        elif i < r:
-            return self.select(x.left, i)
-        else:
-            return self.select(x.right, i - r)
-
-    def rank(self, x):
-        r = x.left.size + 1
-        y = x
-        while y != self.T:
-            if y == y.parent.right:
-                r = r + y.parent.left.size + 1
-            y = y.parent
-        return r
+        NIL = Node( key = "NIL", color = COLOR.BLACK, size = 0 )
+        self.T = NIL
+        self.NIL = NIL
 
     def find(self, x, i):
         if x == self.NIL:
@@ -64,8 +47,7 @@ class RedBlackTree:
                 y.left = z
             else:
                 y.right = z
-        z.left = self.NIL
-        z.right = self.NIL
+        z.left = z.right = self.NIL
         z.color = COLOR.RED
         self.insert_fixup(z)
 
@@ -157,87 +139,10 @@ class RedBlackTree:
             y = y.parent
         return y
 
-    def delete_fixup(self, x):
-        while x != self.T and (x == self.NIL or x.color == COLOR.BLACK):
-            father = x.parent
-            if x == father.left:
-                w = father.right
-                if w == self.NIL:
-                    x = self.T
-                else:
-                    if w.color == COLOR.RED:
-                        w.color = COLOR.BLACK
-                        father.color = COLOR.RED
-                        self.left_rotate(father)
-                        w = father.right
-                    if (w.left == self.NIL or w.left.color == COLOR.BLACK) and \
-                            (w.right == self.NIL or w.right.color == COLOR.BLACK):
-                        w.color = COLOR.RED
-                        x = father
-                    else:
-                        if w.right == self.NIL or  w.right.color == COLOR.BLACK:
-                            if w.left != self.NIL:
-                                w.left.color = COLOR.BLACK
-                                w.color = COLOR.RED
-                                self.right_rotate(w)    # w
-                                w = father.right
-                        w.color = father.color
-                        father.color = COLOR.BLACK
-                        if w.right != self.NIL:
-                            w.right.color = COLOR.BLACK
-                        self.left_rotate(father)    # father
-                        x = self.T
-            else:
-                w = father.left
-                if w == self.NIL:
-                    x = self.T
-                else:
-                    if w.color == COLOR.RED:
-                        w.color = COLOR.BLACK
-                        father.color = COLOR.RED
-                        self.right_rotate(father) # father
-                        w = father.left
-                    if (w.left == self.NIL or w.left.color == COLOR.BLACK) and \
-                            (w.right == self.NIL or w.right.color == COLOR.BLACK):
-                        w.color = COLOR.RED
-                        x = father
-                    else:
-                        if w.left == self.NIL or w.left.color == COLOR.BLACK:
-                            if w.right != self.NIL:
-                                w.right.color = COLOR.BLACK
-                                w.color = COLOR.RED
-                                self.left_rotate(w)   # w
-                                w = father.left
-                        w.color = father.color
-                        father.color = COLOR.BLACK
-                        if w.left != self.NIL:
-                            w.left.color = COLOR.BLACK
-                        self.right_rotate(father)   # father
-                        x = self.T
-
-        if x != self.NIL:
-            x.color = COLOR.BLACK
-
-    def transplant(self, u, v):
-        if u.parent == self.NIL:
-            self.T = v
-        elif u == u.parent.left:
-            u.parent.left = v
-        else:
-            u.parent.right = v
-        v.parent = u.parent
-
     def delete(self, i):
 
         z = self.find(self.T, i)
-
-        # does not exists
-        if z == self.NIL:
-            return 0
-
-        # ==========================
-
-        y = x = None
+        y = None
 
         if z.left == self.NIL or z.right == self.NIL:
             y = z
@@ -249,7 +154,6 @@ class RedBlackTree:
         else:
             x = y.right
 
-        if x == self.NIL: x = Node( color = COLOR.BLACK )  # 필구 추가
         x.parent = y.parent
 
         if y.parent == self.NIL:
@@ -265,8 +169,54 @@ class RedBlackTree:
         if y.color == COLOR.BLACK:
             self.delete_fixup(x)
 
-
         return y
+
+    def delete_fixup(self, x):
+        while x != self.T and x.color == COLOR.BLACK:
+            if x == x.parent.left:
+                w = x.parent.right
+                if w.color == COLOR.RED:
+                    w.color = COLOR.BLACK
+                    x.parent.color = COLOR.RED
+                    self.left_rotate(x.parent)
+                    w = x.parent.right
+                if w.left.color == COLOR.BLACK and w.right.color == COLOR.BLACK:
+                    w.color = COLOR.RED
+                    x = x.parent
+                else:
+                    if w.right.color == COLOR.BLACK:
+                        w.left.color = COLOR.BLACK
+                        w.color = COLOR.RED
+                        self.right_rotate(w)
+                        w = x.parent.right
+                    w.color = x.parent.color
+                    x.parent.color = COLOR.BLACK
+                    w.right.color = COLOR.BLACK
+                    self.left_rotate(x.parent)
+                    x = self.T
+            else:
+                w = x.parent.left
+                if w.color == COLOR.RED:
+                    w.color = COLOR.BLACK
+                    x.parent.color = COLOR.RED
+                    self.right_rotate(x.parent)
+                    w = x.parent.left
+                if w.right.color == COLOR.BLACK and w.left.color == COLOR.BLACK:
+                    w.color = COLOR.RED
+                    x = x.parent
+                else:
+                    if w.left.color == COLOR.BLACK:
+                        w.right.color = COLOR.BLACK
+                        w.color = COLOR.RED
+                        self.left_rotate(w)
+                        w = x.parent.left
+                    w.color = x.parent.color
+                    x.parent.color = COLOR.BLACK
+                    w.left.color = COLOR.BLACK
+                    self.right_rotate(x.parent)
+                    x = self.T
+
+        self.T.color = COLOR.BLACK
 
 lst = [41, 38, 31, 12, 19, 8]
 # lst = [26, 17, 41, 14, 21,30, 47, 10, 16, 19, 21, 28, 38, 7, 12, 14, 20, 35, 39, 3]
