@@ -77,10 +77,10 @@ class RedBlackTree:
                 else:
                     if z == z.parent.left:
                         z = z.parent
-                        self.left_rotate(z) # might have to change this
+                        self.right_rotate(z) # might have to change this
                     z.parent.color = COLOR.BLACK
                     z.parent.parent.color = COLOR.RED
-                    self.right_rotate(z.parent.parent) # might have to change this
+                    self.left_rotate(z.parent.parent) # might have to change this
         self.T.color = COLOR.BLACK
 
     def right_rotate(self, x):
@@ -183,6 +183,7 @@ class RedBlackTree:
                 if w.left.color == COLOR.BLACK and w.right.color == COLOR.BLACK:
                     w.color = COLOR.RED
                     x = x.parent
+                    # x.parent = x.parent.parent
                 else:
                     if w.right.color == COLOR.BLACK:
                         w.left.color = COLOR.BLACK
@@ -197,37 +198,40 @@ class RedBlackTree:
             else:
                 w = x.parent.left
                 if w.color == COLOR.RED:
-                    w.color = COLOR.BLACK
-                    x.parent.color = COLOR.RED
-                    self.right_rotate(x.parent)
-                    w = x.parent.left
+                    w.color = COLOR.BLACK                       # case 1
+                    x.parent.color = COLOR.RED                  # case 1
+                    self.right_rotate(x.parent)                 # case 1
+                    w = x.parent.left                           # case 1
                 if w.right.color == COLOR.BLACK and w.left.color == COLOR.BLACK:
-                    w.color = COLOR.RED
-                    x = x.parent
+                    w.color = COLOR.RED                         # case 2
+                    x = x.parent                                # case 2
+                    # x.parent = x.parent.parent
                 else:
                     if w.left.color == COLOR.BLACK:
-                        w.right.color = COLOR.BLACK
-                        w.color = COLOR.RED
-                        self.left_rotate(w)
-                        w = x.parent.left
-                    w.color = x.parent.color
-                    x.parent.color = COLOR.BLACK
-                    w.left.color = COLOR.BLACK
-                    self.right_rotate(x.parent)
-                    x = self.T
+                        w.right.color = COLOR.BLACK             # case 3
+                        w.color = COLOR.RED                     # case 3
+                        self.left_rotate(w)                     # case 3
+                        w = x.parent.left                       # case 3
+                    w.color = x.parent.color                    # case 4
+                    x.parent.color = COLOR.BLACK                # case 4
+                    w.left.color = COLOR.BLACK                  # case 4
+                    self.right_rotate(x.parent)                 # case 4
+                    x = self.T                                  # case 4
 
-        self.T.color = COLOR.BLACK
+        x.color = COLOR.BLACK
 
-lst = [41, 38, 31, 12, 19, 8]
-# lst = [26, 17, 41, 14, 21,30, 47, 10, 16, 19, 21, 28, 38, 7, 12, 14, 20, 35, 39, 3]
+testcase = [
+    { "insert" : [41, 38, 31, 12, 19, 8], "delete" : [ 8, 12, 19, 31, 38, 41 ] }
+]
+
+
 tree = RedBlackTree()
 
-for i in lst:
-    tree.insert(Node(key = i))
+for case in testcase:
+    for i in case["insert"]:
+        tree.insert(Node(key = i))
+        a = 1
 
-tree.delete( 19 )
-
-tree.delete( 12 )
-
-if len(lst) == 3:
-    print("hello")
+    for i in case["delete"]:
+        tree.delete(i)
+        a = 2
