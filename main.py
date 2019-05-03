@@ -25,8 +25,7 @@ class RedBlackTree:
         # sentinel object
         self.NIL = NIL
 
-    # CLRS textbook partition pseudocode
-    # page: 147
+    # A simple tree recursive search method
     def find(self, x, i):
         if x == self.NIL:
             return self.NIL
