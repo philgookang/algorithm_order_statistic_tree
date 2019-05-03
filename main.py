@@ -88,10 +88,10 @@ class RedBlackTree:
                 else:
                     if z == z.parent.left:
                         z = z.parent
-                        self.right_rotate(z) # might have to change this
+                        self.right_rotate(z)
                     z.parent.color = COLOR.BLACK
                     z.parent.parent.color = COLOR.RED
-                    self.left_rotate(z.parent.parent) # might have to change this
+                    self.left_rotate(z.parent.parent) 
         self.T.color = COLOR.BLACK
 
     # CLRS textbook RIGHT-ROTATE pseudocode
