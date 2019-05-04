@@ -25,6 +25,28 @@ class RedBlackTree:
         # sentinel object
         self.NIL = NIL
 
+    # CLRS textbook OS-SELECT pseudocode
+    # page: 304
+    def select(self, x, i):
+        r = self.T.left.size + 1
+        if i == r:
+            return x
+        elif i < r:
+            return self.select(x.left, i)
+        else:
+            return self.select(x.right, i - r)
+
+    # CLRS textbook OS-RANK pseudocode
+    # page: 305
+    def rank(self, x):
+        r = x.left.size + 1
+        y = x
+        while y != self.T:
+            if y == y.parent.right:
+                r = r + y.parent.left.size + 1
+            y = y.parent
+        return r
+
     # A simple tree recursive search method
     def find(self, x, i):
         if x == self.NIL:
@@ -38,7 +60,12 @@ class RedBlackTree:
 
     # CLRS textbook RB-INSERT-FIXUP pseudocode
     # page: 281
-    def insert(self, z):
+    def insert(self, i):
+
+        if self.NIL != self.find(i):
+            return 0
+
+        z = Node(key = i)
         y = self.NIL
         x = self.T
         while x != self.NIL:
@@ -59,6 +86,8 @@ class RedBlackTree:
         z.left = z.right = self.NIL
         z.color = COLOR.RED
         self.insert_fixup(z)
+
+        return i
 
     # CLRS textbook RB-INSERT pseudocode
     # page: 280
@@ -161,6 +190,10 @@ class RedBlackTree:
     def delete(self, i):
 
         z = self.find(self.T, i)
+
+        if z == self.NIL:
+            return 0
+
         y = None
 
         if z.left == self.NIL or z.right == self.NIL:
@@ -195,7 +228,7 @@ class RedBlackTree:
         if y.color == COLOR.BLACK:
             self.delete_fixup(x)
 
-        return y
+        return i
 
     # CLRS textbook RB-DELETE-FIXUP pseudocode
     # page: 289
@@ -245,17 +278,24 @@ class RedBlackTree:
                     x = self.T                                  # case 4
         x.color = COLOR.BLACK
 
+
+def readFile(tree, filename):
+    with open(filename, "r") as fp:
+        for line in fp:
+            row = line.split(" ")
+            operation = row[0]
+            value = int(row[1])
+
+            if operation == "I":
+                tree.insert(value)
+            elif operation == "D":
+                tree.delete(value)
+            elif operation == "S":
+                tree.select(tree.T, value)
+            elif operation == "R":
+                tree.rank(value)
+
 if __name__ == "__main__":
 
-    testcase = [
-        { "insert" : [41, 38, 31, 12, 19, 8], "delete" : [ 8, 12, 19, 31, 38, 41 ] }
-    ]
-
     tree = RedBlackTree()
-
-    for case in testcase:
-        for i in case["insert"]:
-            tree.insert(Node(key = i))
-
-        for i in case["delete"]:
-            tree.delete(i)
+    readFile(tree, "testcase_1.txt")
