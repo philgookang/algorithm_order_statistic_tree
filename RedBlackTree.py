@@ -28,7 +28,7 @@ class RedBlackTree:
     # CLRS textbook OS-SELECT pseudocode
     # page: 304
     def select(self, x, i):
-        r = self.T.left.size + 1
+        r = x.left.size + 1
         if i == r:
             return x
         elif i < r:
@@ -62,7 +62,7 @@ class RedBlackTree:
     # page: 281
     def insert(self, i):
 
-        if self.NIL != self.find(i):
+        if self.NIL != self.find(self.T, i):
             return 0
 
         z = Node(key = i)
