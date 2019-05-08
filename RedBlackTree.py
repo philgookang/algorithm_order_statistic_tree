@@ -62,7 +62,7 @@ class RedBlackTree:
     # page: 281
     def insert(self, i):
 
-        if self.NIL != self.find(i):
+        if self.NIL != self.find(self.T, i):
             return 0
 
         z = Node(key = i)
@@ -120,7 +120,7 @@ class RedBlackTree:
                         self.right_rotate(z)
                     z.parent.color = COLOR.BLACK
                     z.parent.parent.color = COLOR.RED
-                    self.left_rotate(z.parent.parent) 
+                    self.left_rotate(z.parent.parent)
         self.T.color = COLOR.BLACK
 
     # CLRS textbook RIGHT-ROTATE pseudocode
