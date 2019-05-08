@@ -28,7 +28,7 @@ class RedBlackTree:
     # CLRS textbook OS-SELECT pseudocode
     # page: 304
     def select(self, x, i):
-        r = self.T.left.size + 1
+        r = x.left.size + 1
         if i == r:
             return x
         elif i < r:
