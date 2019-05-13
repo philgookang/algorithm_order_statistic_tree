@@ -1,3 +1,4 @@
+import random
 
 class COLOR:
     RED     = "RED"
@@ -185,8 +186,6 @@ def delete_fixup(x):
 
 def init():
     global l
-    global cnt
-    # l = []
 
     # Sentinel nil[T] object
     global NIL
@@ -314,22 +313,285 @@ def os_rank(i):
     return r
 
 def check(opt_seq,in_seq,out_seq):
-    h = {  }
-    init()
+
+    A = []
+
+    # Checker program array insert
+    def checker_insert(array, val):
+        if val in array: return 0
+        array.append(val)
+        return val
+
+    # Checker program array delete
+    def checker_delete(array, val):
+        if val in array:
+            array.remove(val)
+            return val
+        return 0
+
+    # Checker program check rank
+    def checker_rank(A, x):
+        A = A.copy()
+        location = -1
+        A.sort()
+        for ind, val in enumerate(A):
+            if x == A[ind]:
+                location = ind
+                break
+
+        # 못 찾았으면 0
+        if location == -1: return 0
+
+        # 아니면 실째 위띵
+        return location + 1
+
+    # Checker program select
+    def checker_select(A, val):
+
+        # CLRS textbook partition pseudocode
+        # page: 147
+        def Partition(A, p, r):
+            x = A[r]  # select pivot as the last element in list
+            i = p - 1  # get starting position
+            for j in range(p, r):
+                if A[j] <= x:  # check current value is smaller than pivot
+                    i = i + 1
+                    A[i], A[j] = A[j], A[i]  # switch location
+            A[i + 1], A[r] = A[r], A[i + 1]  # move pivot to correct location
+            return i + 1
+
+        # CLRS textbook randomized partition pseudocode
+        # page: 154
+        def RandomPartition(A, p, r):
+            # select a random position as pivot
+            try:
+                i = random.randint(p, r)
+            except ValueError:
+                i = random.randint(r, p)
+            A[i], A[r] = A[r], A[i]  # send pivot to last location in array
+
+            # sort by pivot
+            return Partition(A, p, r)
+
+        # CLRS textbook randomized select pseudocode
+        # page: 186
+        def RandomSelect(A, p, r, i):
+
+            # check if i is inside array len
+            if i > len(A):
+                return 0
+
+            # if only one in the array return it
+            if p == r:
+                return A[r]
+
+            # get a random index
+            q = RandomPartition(A, p, r)
+
+            # check if we have found item
+            # i = k what we have found is equal to search then return
+            # i < k what we have found is larger then search between p to q
+            # i > k what we have found is larger then search between q to r
+            k = q - p + 1
+            if i == k:
+                return A[q]
+            elif i < k:
+                return RandomSelect(A, p, q - 1, i)
+            else:
+                return RandomSelect(A, q + 1, r, i - k)
+
+        return RandomSelect(A.copy(), 0, (len(A) - 1), val)
+
     for opt,val,ans in zip(opt_seq,in_seq,out_seq):
-        if opt==0:
-            h[val] = 1
-            if os_insert(val)!=ans:
+
+        # 0 : insert
+        if opt == 0:
+            b = checker_insert(A, val)
+            # print(opt, val, ans, b)
+            if b != ans:
                 return False
+
+        # 1 : delete
         elif opt==1:
-            if os_delete(val)!=ans:
+            b = checker_delete(A, val)
+            # print(opt, val, ans, b)
+            if b != ans:
                 return False
+
+        # 2 : select
         elif opt==2:
-            if os_select(val)!=ans:
+            b = checker_select(A, val)
+            # print(opt, val, ans, b)
+            if b != ans:
                 return False
+
+        # 3 : rank
         else:
-            if os_rank(val)!=ans:
+            b = checker_rank(A, val)
+            # print(opt, val, ans, b)
+            if b != ans:
                 return False
+
     return True
 
+if __name__=="__main__":
 
+    # 0 : insert
+    # 1 : delete
+    # 2 : select
+    # 3 : rank
+
+    # Test Case 1
+    opt_seq = [ ]
+    in_seq  = [ ]
+    out_seq = [ ]
+
+    # insert
+    opt_seq.extend([ 0, 0, 0, 0, 0, 0])
+    in_seq.extend([41, 38, 31, 12, 19, 8])
+
+    # select
+    opt_seq.extend([2])
+    in_seq.extend([2])
+
+    # delete
+    opt_seq.extend([1])
+    in_seq.extend([12])
+
+    # select
+    opt_seq.extend([2, 2])
+    in_seq.extend([2, 50])
+
+    # rank
+    opt_seq.extend([3, 3, 3, 3])
+    in_seq.extend([31, 8, 38, 5])
+
+    # delete
+    opt_seq.extend([1, 1, 1, 1])
+    in_seq.extend([12, 51, 52, 53])
+
+    # init tree global variables
+    init()
+
+    for opt, val in zip(opt_seq, in_seq):
+        if opt == 0:
+            out_seq.append(os_insert(val))
+        elif opt == 1:
+            out_seq.append(os_delete(val))
+        elif opt == 2:
+            out_seq.append(os_select(val))
+        elif opt == 3:
+            out_seq.append(os_rank(val))
+
+    if check(opt_seq, in_seq, out_seq):
+        print("correct")
+    else:
+        print("incorrect")
+
+    #######################################################################################################################################
+
+    # 0 : insert
+    # 1 : delete
+    # 2 : select
+    # 3 : rank
+
+    # Test Case 2
+    opt_seq = [ ]
+    in_seq  = [ ]
+    out_seq = [ ]
+
+    # select
+    opt_seq.extend([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
+    in_seq.extend([4,5,6,7,8,9,12,13,14,15,16])
+
+    # insert
+    opt_seq.extend([ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    in_seq.extend([15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
+
+    # select
+    opt_seq.extend([2, 2, 2, 2, 2])
+    in_seq.extend([2, 4, 6, 8, 10])
+
+    # rank
+    opt_seq.extend([3, 3, 3, 3, 3])
+    in_seq.extend([7,8,9,10,11])
+
+    # delete
+    opt_seq.extend([1, 1, 1, 1, 1, 1])
+    in_seq.extend([1, 3, 5, 7, 9, 11])
+
+    # select
+    opt_seq.extend([2, 2, 2, 2])
+    in_seq.extend([2, 4, 6, 8])
+
+    # rank
+    opt_seq.extend([3, 3, 3, 3])
+    in_seq.extend([31, 8, 38, 5])
+
+    # delete
+    opt_seq.extend([1, 1, 1, 1])
+    in_seq.extend([12, 51, 52, 53])
+
+    # init tree global variables
+    init()
+
+    for opt, val in zip(opt_seq, in_seq):
+        if opt == 0:
+            out_seq.append(os_insert(val))
+        elif opt == 1:
+            out_seq.append(os_delete(val))
+        elif opt == 2:
+            out_seq.append(os_select(val))
+        elif opt == 3:
+            out_seq.append(os_rank(val))
+
+    if check(opt_seq, in_seq, out_seq):
+        print("correct")
+    else:
+        print("incorrect")
+
+    #######################################################################################################################################
+
+    # 0 : insert
+    # 1 : delete
+    # 2 : select
+    # 3 : rank
+
+    # Test Case 3
+    opt_seq = []
+    in_seq = []
+    out_seq = []
+
+    for i in range(30000):
+
+        opt_seq = []
+        in_seq = []
+        out_seq = []
+
+        for j in range(3000):
+
+            # create random operation
+            opt_seq.append(random.randint(0, 3))
+
+            # create random number
+            in_seq.append(random.randint(1, 9999))
+
+        # init tree global variables
+        init()
+
+        for opt, val in zip(opt_seq, in_seq):
+            if opt == 0:
+                out_seq.append(os_insert(val))
+            elif opt == 1:
+                out_seq.append(os_delete(val))
+            elif opt == 2:
+                out_seq.append(os_select(val))
+            elif opt == 3:
+                out_seq.append(os_rank(val))
+
+        if check(opt_seq, in_seq, out_seq):
+            print(i, "correct")
+        else:
+            print(i, "incorrect")
+            print((opt_seq, in_seq, out_seq))
+            break
